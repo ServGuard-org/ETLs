@@ -5,7 +5,8 @@
 #Captura de dados para o histograma:
 #-------------------------------------------------------------------------------
 # escolhaBaseDeDados <- "SQL"
-escolhaBaseDeDados <- "CSV"
+#escolhaBaseDeDados <- "CSV"
+escolhaBaseDeDados <- "simulacao"
 
 if (escolhaBaseDeDados == "SQL") {
   
@@ -14,7 +15,7 @@ if (escolhaBaseDeDados == "SQL") {
   
   conexao <- dbConnect(RMySQL::MySQL(),
                        dbname = "ServGuard",
-                       host = "127.0.0.1",
+                       host = "127.0.0.1",#IP público da instância
                        port = 3306,
                        user = "root",
                        password = "urubu100")
@@ -25,15 +26,17 @@ if (escolhaBaseDeDados == "SQL") {
   #Chamar o select e transformar os dado recebidos em uma variavel:
   usoCpu <- dbGetQuery(conexao, select)
   
-} else {
+} else if (escolhaBaseDeDados == "CSV"){
   #colocar o codigo de captura dos dados por CSV aqui
   captura <- read.csv("C:/Users/cacay/Downloads/dados-pc.csv", sep=",")
-  str(captura)
-  
-  #Remove o "%" caso exista na coluna
+  captura
+  #Remove o "%" caso exista na coluna:
   usoCPU <- as.numeric(gsub("%", "", captura$CPU))  
-  #Teste com valores fictícios
-  usoCPU <- c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100,100)  
+} else {
+  #Teste com valores simulados:
+  n <- 100
+  usoCPU <- runif(n, min = 0, max = 100)
+  
 }
 #-------------------------------------------------------------------------------
 #Captura de dados para o histograma - Fim
