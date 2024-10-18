@@ -51,7 +51,11 @@ if (escolhaBaseDeDados == "SQL") {
 faixas <- seq(0, 100, by=10)
 histograma <- hist(usoCPU, #Dados utilizados
                    breaks=faixas, #Faixas de 10 em 10 %
-                   freq=TRUE, 
+                   freq=TRUE,
+                   col = ("#4E2E9E"),
+                   main = "Histograma de uso: CPU(%)",
+                   xlab = "Faixas de uso (%)",
+                   ylab = "Frequência",
                    right = FALSE, #Extende o y a maior frequencia histograma
                    xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
                    ylim = c(0, max(histograma$counts)+2)#Fixa o valor de 0 ao max do histograma 
