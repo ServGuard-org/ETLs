@@ -5,8 +5,8 @@
 #Captura de dados para o histograma:
 #-------------------------------------------------------------------------------
 #escolhaBaseDeDados <- "SQL"
-#escolhaBaseDeDados <- "CSV"
-escolhaBaseDeDados <- "simulacao"
+escolhaBaseDeDados <- "CSV"
+#escolhaBaseDeDados <- "simulacao"
 
 if (escolhaBaseDeDados == "SQL") {
   
@@ -28,9 +28,9 @@ if (escolhaBaseDeDados == "SQL") {
   
 } else if (escolhaBaseDeDados == "CSV"){
   #colocar o codigo de captura dos dados por CSV aqui
-  captura <- read.csv("C:/Users/cacay/Downloads/dados-pc.csv", sep=",")
-  #Remove o "%" caso exista na coluna:
-  usoCPU <- as.numeric(gsub("%", "", captura$CPU))  
+  captura <- read.csv("C:/Users/cacay/Documents/Git-Hub/ServGuard-ETLs/dados-csv.csv", sep=";")
+  head(captura$fkMaquinaRecurso)
+  usoCPU <- as.numeric(captura$registro[captura$fkMaquinaRecurso==1])  
 } else {
   #Teste com valores simulados:
   n <- 100
@@ -58,7 +58,7 @@ histograma <- hist(usoCPU, #Dados utilizados
                    ylab = "Frequência",
                    right = FALSE, #Extende o y a maior frequencia histograma
                    xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
-                   ylim = c(0, max(histograma$counts)+2)#Fixa o valor de 0 ao max do histograma 
+                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
 
 #Colocando o valor de frequencia em cima das colunas.
 text(x = histograma$mids, #Posição x
