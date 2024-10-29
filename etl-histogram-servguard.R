@@ -24,7 +24,8 @@ if (escolhaBaseDeDados == "SQL") {
                        password = "urubu100")
   
   #Variavel com o select do banco:
-  select <- "SELECT * FROM vista_registro_cpu;" #colocar a view aqui
+  select <- "SELECT registro FROM vista_registro_cpu WHERE idEmpresa = 1 AND fkRecurso = 1;"
+  
   #Chamar o select e transformar os dado recebidos em uma variavel:
   usoCPU <- dbGetQuery(conexao, select)
 
