@@ -1,0 +1,135 @@
+---
+title: "Relatório Semanal"
+author: "Equipe de AD - ServGuard"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+ 
+ Utilizando os dados capturados dos ultimos sete dias, foi feita uma análise personalisada com o objetivo de apresentar insights do sistema de monitoramento.
+
+```{r echo=FALSE}
+#Pacote para acessar dinamicamente o banco de dados:
+  requireNamespace("DBI", quietly = TRUE)
+  library(DBI)
+  requireNamespace("RMySQL", quietly = TRUE)
+  library(RMySQL)
+  
+  conexao <- dbConnect(RMySQL::MySQL(),
+                       dbname = "ServGuard",#Nome do banco de dados
+                       host = "127.0.0.1",#IP público da instância
+                       port = 3306, 
+                       user = "root",
+                       password = "urubu100")
+  
+  #Variavel com o select do banco:
+  select <- "SELECT * FROM vista_capturas_relatorio_semanal  WHERE idEmpresa = 1;"
+  
+  #Chamar o select e transformar os dado recebidos em uma variavel:
+  dadosCaptura <- dbGetQuery(conexao,select)
+```
+
+# Análise de Uso de Recursos:
+
+### A partir dos dados de uso de CPU e RAM, é possível calcular o uso geral das máquinas, assim criamos 3 histogramas para entender o comportamento do uso das máquinas monitoradas.
+
+```{r pressure, echo=FALSE}
+
+#HISTOGRAMA DE USO GERAL
+#======================================================================================================
+faixas <- seq(0, 100, by=10)
+histograma <- hist(dadosCaptura$registro, #Dados utilizados
+                   breaks=faixas, #Faixas de 10 em 10 %
+                   freq=TRUE,
+                   col = ("#4E2E9E"),
+                   main = "Histograma de Uso Geral de Maquinas",
+                   xlab = "Faixas de uso (%)",
+                   ylab = "Frequencia",
+                   right = FALSE, #Extende o y a maior frequencia histograma
+                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
+                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+
+#Colocando o valor de frequencia em cima das colunas.
+text(x = histograma$mids, #Posição x
+     y = histograma$counts, #Posição y
+     labels = histograma$counts, #valor do texto
+     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
+     cex = 0.8,) #Tamanho do texto
+
+
+
+#HISTOGRAMA DE USO CPU
+#======================================================================================================
+
+histograma <- hist(dadosCaptura$registro, #Dados utilizados
+                   breaks=faixas, #Faixas de 10 em 10 %
+                   freq=TRUE,
+                   col = ("#4E2E9E"),
+                   main = "Histograma de Uso Geral de Maquinas",
+                   xlab = "Faixas de uso (%)",
+                   ylab = "Frequencia",
+                   right = FALSE, #Extende o y a maior frequencia histograma
+                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
+                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+
+#Colocando o valor de frequencia em cima das colunas.
+text(x = histograma$mids, #Posição x
+     y = histograma$counts, #Posição y
+     labels = histograma$counts, #valor do texto
+     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
+     cex = 0.8,) #Tamanho do texto
+
+
+
+#HISTOGRAMA DE USO RAM
+#======================================================================================================
+
+histograma <- hist(dadosCaptura$registro, #Dados utilizados
+                   breaks=faixas, #Faixas de 10 em 10 %
+                   freq=TRUE,
+                   col = ("#4E2E9E"),
+                   main = "Histograma de Uso Geral de Maquinas",
+                   xlab = "Faixas de uso (%)",
+                   ylab = "Frequencia",
+                   right = FALSE, #Extende o y a maior frequencia histograma
+                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
+                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+
+#Colocando o valor de frequencia em cima das colunas.
+text(x = histograma$mids, #Posição x
+     y = histograma$counts, #Posição y
+     labels = histograma$counts, #valor do texto
+     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
+     cex = 0.8,) #Tamanho do texto
+
+```
+
+
+# Análise de Rede:
+
+## No monitoramento de Rede podemos observar sua estabilidade e desempenho.
+
+```{r pressure, echo=FALSE}
+
+# CALCULO DE PERDA DE PACOTES
+pacotes_recebidos <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes recebidos
+pacotes_enviados <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes enviados
+erro_pacotes_entrada <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de entrada com erro
+erro_pacotes_saida <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de saída com erro
+descarte_pacotes_entrada <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de entrada descartados
+descarte_pacotes_saida <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de saída descartados
+
+pacotes_perdidos <- erro_pacotes_entrada + erro_pacotes_saida + descarte_pacotes_entrada  + descarte_pacotes_saida
+
+pacotes_recebidos_totais <- pacotes_recebidos + pacotes_enviados + pacotes_perdidos
+
+taxa_perda_pacotes <- (pacotes_perdidos / pacotes_recebidos_totais) * 100
+
+
+
+```
+
