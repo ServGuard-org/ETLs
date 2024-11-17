@@ -31,80 +31,80 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
   
   #Chamar o select e transformar os dado recebidos em uma variavel:
   dadosCaptura <- dbGetQuery(conexao,select)
+  dadosCaptura$dthCriacao <- as.Date(dadosCaptura$dthCriaca)
 ```
 
 # Análise de Uso de Recursos:
 
 ### A partir dos dados de uso de CPU e RAM, é possível calcular o uso geral das máquinas, assim criamos 3 histogramas para entender o comportamento do uso das máquinas monitoradas.
 
-```{r pressure, echo=FALSE}
+```{r pressure_hist, echo=FALSE}
 
 #HISTOGRAMA DE USO GERAL
 #======================================================================================================
 faixas <- seq(0, 100, by=10)
-histograma <- hist(dadosCaptura$registro, #Dados utilizados
-                   breaks=faixas, #Faixas de 10 em 10 %
+histograma <- hist(dadosCaptura$registro[dadosCaptura$registro == 3],
+                   breaks=faixas,
                    freq=TRUE,
                    col = ("#4E2E9E"),
                    main = "Histograma de Uso Geral de Maquinas",
                    xlab = "Faixas de uso (%)",
                    ylab = "Frequencia",
-                   right = FALSE, #Extende o y a maior frequencia histograma
-                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
-                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+                   right = FALSE,
+                   xlim = c(0,100))
+                   ylim = c(0, (max(histograma$counts)+2))
 
-#Colocando o valor de frequencia em cima das colunas.
-text(x = histograma$mids, #Posição x
-     y = histograma$counts, #Posição y
-     labels = histograma$counts, #valor do texto
-     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
-     cex = 0.8,) #Tamanho do texto
+text(x = histograma$mids, 
+     y = histograma$counts,
+     labels = histograma$counts, 
+     pos = 3,
+     cex = 0.8,) 
 
 
 
 #HISTOGRAMA DE USO CPU
 #======================================================================================================
 
-histograma <- hist(dadosCaptura$registro, #Dados utilizados
-                   breaks=faixas, #Faixas de 10 em 10 %
+faixas <- seq(0, 100, by=10)
+histograma <- hist(dadosCaptura$registro[dadosCaptura$registro == 1],
+                   breaks=faixas,
                    freq=TRUE,
                    col = ("#4E2E9E"),
-                   main = "Histograma de Uso Geral de Maquinas",
+                   main = "Histograma de Uso de CPU",
                    xlab = "Faixas de uso (%)",
                    ylab = "Frequencia",
-                   right = FALSE, #Extende o y a maior frequencia histograma
-                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
-                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+                   right = FALSE,
+                   xlim = c(0,100))
+                   ylim = c(0, (max(histograma$counts)+2))
 
-#Colocando o valor de frequencia em cima das colunas.
-text(x = histograma$mids, #Posição x
-     y = histograma$counts, #Posição y
-     labels = histograma$counts, #valor do texto
-     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
-     cex = 0.8,) #Tamanho do texto
+text(x = histograma$mids, 
+     y = histograma$counts,
+     labels = histograma$counts, 
+     pos = 3,
+     cex = 0.8,) 
 
 
 
 #HISTOGRAMA DE USO RAM
 #======================================================================================================
 
-histograma <- hist(dadosCaptura$registro, #Dados utilizados
-                   breaks=faixas, #Faixas de 10 em 10 %
+faixas <- seq(0, 100, by=10)
+histograma <- hist(dadosCaptura$registro[dadosCaptura$registro == 2],
+                   breaks=faixas,
                    freq=TRUE,
                    col = ("#4E2E9E"),
-                   main = "Histograma de Uso Geral de Maquinas",
+                   main = "Histograma de Uso de RAM",
                    xlab = "Faixas de uso (%)",
                    ylab = "Frequencia",
-                   right = FALSE, #Extende o y a maior frequencia histograma
-                   xlim = c(0,100))#Fixa o valor de 0 a 100 na exibição 
-                   ylim = c(0, (max(histograma$counts)+2))#Fixa o valor de 0 ao max do histograma 
+                   right = FALSE,
+                   xlim = c(0,100))
+                   ylim = c(0, (max(histograma$counts)+2))
 
-#Colocando o valor de frequencia em cima das colunas.
-text(x = histograma$mids, #Posição x
-     y = histograma$counts, #Posição y
-     labels = histograma$counts, #valor do texto
-     pos = 3, #Ponto aonde o texto fica, no caso 3 significa acima da coluna 
-     cex = 0.8,) #Tamanho do texto
+text(x = histograma$mids, 
+     y = histograma$counts,
+     labels = histograma$counts, 
+     pos = 3,
+     cex = 0.8,) 
 
 ```
 
@@ -113,23 +113,95 @@ text(x = histograma$mids, #Posição x
 
 ## No monitoramento de Rede podemos observar sua estabilidade e desempenho.
 
-```{r pressure, echo=FALSE}
+```{r pressure_rede, echo=FALSE}
 
 # CALCULO DE PERDA DE PACOTES
-pacotes_recebidos <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes recebidos
-pacotes_enviados <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes enviados
-erro_pacotes_entrada <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de entrada com erro
-erro_pacotes_saida <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de saída com erro
-descarte_pacotes_entrada <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de entrada descartados
-descarte_pacotes_saida <- dadosCaptura$registro[dadosCaptura$idRecurso == 13]# Pacotes de saída descartados
+#======================================================================================================
+library(dplyr)
+dadosRede <- dadosCaptura %>%
+  group_by(dthCriacao) %>%
+  summarize(
+    erro_pacotes_entrada = sum(registro[idRecurso == 6]),
+    erro_pacotes_saida = sum(registro[idRecurso == 7]),
+    descarte_pacotes_entrada = sum(registro[idRecurso == 8]),
+    descarte_pacotes_saida = sum(registro[idRecurso == 9]),
+    pacotes_enviados = sum(registro[idRecurso == 12]),
+    pacotes_recebidos = sum(registro[idRecurso == 13]),
+    pacotes_perdidos = erro_pacotes_entrada + erro_pacotes_saida + descarte_pacotes_entrada + descarte_pacotes_saida,
+    pacotes_recebidos_totais = pacotes_recebidos + pacotes_enviados + pacotes_perdidos,
+    taxa_perda_pacotes = (pacotes_perdidos / pacotes_recebidos_totais) * 100
+  )
 
-pacotes_perdidos <- erro_pacotes_entrada + erro_pacotes_saida + descarte_pacotes_entrada  + descarte_pacotes_saida
+#GRAFICO DE LINHA
+library(ggplot2)
+ggplot(dadosCaptura, aes(x = dadosRede$dthCriacao, y = dadosRede$taxa_perda_pacotes)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "red", size = 2) +
+  labs(
+    title = "Taxa de perda de pacotes por dia:",
+    x = "Data",
+    y = "Taxa de Perda (%)"
+  ) +
+  theme_minimal() +
+  scale_x_date(date_labels = "%d/%m", date_breaks = "1 day")
 
-pacotes_recebidos_totais <- pacotes_recebidos + pacotes_enviados + pacotes_perdidos
 
-taxa_perda_pacotes <- (pacotes_perdidos / pacotes_recebidos_totais) * 100
+
+#MEDIA DE DOWNLOAD E UPLOAD
+#======================================================================================================
+
+m_download <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 4])
+m_upload <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 5])
+
+cat("Média de Download e Upload: ", m_download, m_upload)
+
+
+
+#TAMANHO MEDIO PACOTES
+#======================================================================================================
+
+pacotes_R <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 13])
+pacotes_E <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 12])
+megabyte_R <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 10])
+megabyte_E  <- mean(dadosCaptura$registro[dadosCaptura$idRecurso == 11])
+
+tamanhoMedioPacote <- ((megabyte_E + megabyte_R) * 1024) / (pacotes_E + pacotes_R)
+tamanhoMedioPacote_E <- (megabyte_E * 1024) / pacotes_E
+tamanhoMedioPacote_R <- (megabyte_R * 1024) / pacotes_R
+
+cat("Tamanho médio de pacotes: ", tamanhoMedioPacote)
+
+
+
 
 
 
 ```
 
+
+# Análise de Alerta:
+
+## Mediante aos ultimos 7 dias, criamos as seguintes métricas:
+
+```{r pressure_alert, echo=FALSE}
+
+  qtdAlertas_dia <- dadosCaptura %>%
+  group_by(dthCriacao) %>%
+  summarise(qtdAlertas = sum(isAlerta))
+
+  #"id" do dia para fazer a regressao
+  qtdAlertas_dia <- qtdAlertas_dia %>%
+  mutate(dias = as.integer(dthCriacao - min(dthCriacao)))
+  
+  
+  #GRAFICO PREVISAO DE TENDENCIA
+  ggplot(qtdAlertas_dia, aes(x = dias, y = qtdAlertas)) +
+  geom_line(color = "blue") +  # Linha dos dados
+  geom_point(color = "red") +  # Pontos dos dados
+  geom_smooth(method = "lm", color = "green") +  # Linha de regressão linear
+  labs(title = "Previsao de tendencia",
+       x = "Data",
+       y = "Quantidade de Alertas") +
+  theme_minimal()
+
+```
