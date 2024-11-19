@@ -106,6 +106,31 @@ text(x = histograma$mids,
      pos = 3,
      cex = 0.8,) 
 
+
+
+#TOP 5 MAQUINAS + E - USADAS
+#======================================================================================================
+library(knitr)
+
+media_usogeral_maquina <- dadosCaptura %>%
+  group_by(idMaquina) %>%
+  summarise(mediaUso = mean(dadosCaptura$registro[dadosCaptura$idRecurso=3])) %>%
+  arrange(desc(media_uso)) 
+
+# Top 5 máquinas mais usadas
+top_5_1 <- media_usogeral_maquina %>%
+  slice_max(order_by = media_uso, n = 5)
+
+# Top 5 máquinas menos usadas
+top_5_2 <- media_usogeral_maquina %>%
+  slice_min(order_by = media_uso, n = 5
+
+kable(top5_1, caption = "Máquinas mais usadas")
+kable(top5_2, caption = "Máquinas menos usadas")
+
+
+
+
 ```
 
 
