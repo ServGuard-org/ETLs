@@ -1,27 +1,37 @@
 ---
 title: "Relatório Semanal"
+subtitle: "Análise e Insights do Monitoramento de Servidores"
 author: "Equipe de AD - ServGuard"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+    #theme: cerulean
+    toc: true
+    toc_float: true
+    color: black
+color: black
+    
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(DBI)
+library(RMySQL)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(knitr)
+
 ```
 
- 
- Utilizando os dados capturados dos **ultimos sete dias**, foi feita uma análise personalisada com o objetivo de apresentar insights do sistema de monitoramento.
+# **Introdução**
+#### Este relatório apresenta uma análise detalhada do desempenho dos recursos monitorados e alertas registrados nos últimos sete dias. Através dos dados capturados, destacam-se as tendências de uso de recursos, estabilidade de rede e os recursos mais problemáticos, fornecendo insights importantes para o monitoramento.
 
 ```{r echo=FALSE}
 
 #Pacote:
   requireNamespace("DBI", quietly = TRUE)
-  library(DBI)
   requireNamespace("RMySQL", quietly = TRUE)
-  library(RMySQL)
-  library(knitr)
-  library(dplyr)
-  library(ggplot2)
   
   conexao <- dbConnect(RMySQL::MySQL(),
                        dbname = "ServGuard",#Nome do banco de dados
@@ -39,87 +49,62 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
   
 ```
 
-
-
-# Análise de **Uso de Recursos**:
-
-### A partir dos dados de uso de **CPU** e **RAM**, é possível calcular o uso geral das máquinas, assim criamos 3 histogramas para entender o comportamento do uso das máquinas monitoradas.
+# **Análise de Uso de Recursos**
+#### A partir dos dados de uso de **CPU**, **RAM** e **uso geral**, foram gerados histogramas para identificar padrões de comportamento nas máquinas monitoradas.
 
 ```{r pressure_hist, echo=FALSE}
 
-#Pacote:
-  requireNamespace("DBI", quietly = TRUE)
-  library(DBI)
-  requireNamespace("RMySQL", quietly = TRUE)
-  library(RMySQL)
-  library(knitr)
-  library(dplyr)
-  library(ggplot2)
-
 #HISTOGRAMA DE USO GERAL
 #======================================================================================================
-faixas <- seq(0, 100, by=10)
-histograma1 <- hist(
-  dadosCaptura$registro[dadosCaptura$idRecurso == 3],
-  breaks = seq(0, 100, by = 10),
-  freq = TRUE,
-  col = "#4E2E9E",
-  main = "Histograma de Uso Geral de Máquinas",
-  xlab = "Faixas de uso (%)",
-  ylab = "Frequência",
-  right = FALSE,
-  xlim = c(0, 100),
-)
 
-text(x = histograma1$mids, 
-     y = histograma1$counts,
-     labels = histograma1$counts, 
-     pos = 3,
-     cex = 0.8,) 
+ggplot(dadosCaptura %>% filter(idRecurso == 3), aes(x = registro)) +
+  geom_histogram(
+    breaks = seq(0, 100, by = 10),
+    fill = "#4E2E9E",
+    color = "black",
+    alpha = 0.8
+  ) +
+  labs(
+    title = "Histograma de Uso Geral de Máquinas",
+    x = "Faixas de uso (%)",
+    y = "Frequência"
+  ) +
+  theme_minimal()
+
 
 #HISTOGRAMA DE USO CPU
 #======================================================================================================
 
-faixas <- seq(0, 100, by=10)
-histograma2 <- hist(
-  dadosCaptura$registro[dadosCaptura$idRecurso == 1],
-  breaks = seq(0, 100, by = 10),
-  freq = TRUE,
-  col = "#4E2E9E",
-  main = "Histograma de Uso Geral de Máquinas",
-  xlab = "Faixas de uso (%)",
-  ylab = "Frequência",
-  right = FALSE,
-  xlim = c(0, 100),
-)
-
-text(x = histograma2$mids, 
-     y = histograma2$counts,
-     labels = histograma2$counts, 
-     pos = 3,
-     cex = 0.8,) 
+ggplot(dadosCaptura %>% filter(idRecurso == 1), aes(x = registro)) +
+  geom_histogram(
+    breaks = seq(0, 100, by = 10),
+    fill = "#767576",
+    color = "black",
+    alpha = 0.8
+  ) +
+  labs(
+    title = "Histograma de Uso de CPU",
+    x = "Faixas de uso (%)",
+    y = "Frequência"
+  ) +
+  theme_minimal()
 
 #HISTOGRAMA DE USO RAM
 #======================================================================================================
 
-faixas <- seq(0, 100, by=10)
-histograma3 <- hist(
-  dadosCaptura$registro[dadosCaptura$idRecurso == 2],
-  breaks = seq(0, 100, by = 10),
-  freq = TRUE,
-  col = "#4E2E9E",
-  main = "Histograma de Uso Geral de Máquinas",
-  xlab = "Faixas de uso (%)",
-  ylab = "Frequência",
-  right = FALSE,
-  xlim = c(0, 100),
-)
-
-text(x = histograma3$mids, 
-     y = histograma3$counts,
-     labels = histograma3$counts, 
-     pos = 3,
-     cex = 0.8,) 
+ggplot(dadosCaptura %>% filter(idRecurso == 2), aes(x = registro)) +
+  geom_histogram(
+    breaks = seq(0, 100, by = 10),
+    fill = "#767576",
+    color = "black",
+    alpha = 0.8
+  ) +
+  labs(
+    title = "Histograma de Uso de RAM",
+    x = "Faixas de uso (%)",
+    y = "Frequência"
+  ) +
+  theme_minimal()
 
 #TOP 5 MAQUINAS + E - USADAS
 #======================================================================================================
@@ -136,27 +121,21 @@ top_5_mais_usadas <- media_usogeral_maquina %>%
 top_5_menos_usadas <- media_usogeral_maquina %>%
   slice_min(order_by = mediaUso, n = 5)
 
-kable(top_5_mais_usadas, caption = "Máquinas mais usadas")
-kable(top_5_menos_usadas, caption = "Máquinas menos usadas")
+kable(top_5_mais_usadas, caption = "Top 5 Máquinas Mais Utilizadas") %>%
+  kable_styling(full_width = TRUE, bootstrap_options = c("striped", "hover", "condensed"))
+
+kable(top_5_menos_usadas, caption = "Top 5 Máquinas Menos Utilizadas") %>%
+  kable_styling(full_width = TRUE, bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
 
 
-# Análise de **Rede**:
+# **Análise de Rede**
 
-### No monitoramento de Rede podemos observar sua estabilidade e desempenho.
+#### No monitoramento de Rede podemos observar sua estabilidade e desempenho.
 
 ```{r pressure_rede, echo=FALSE}
-
-#Pacote:
-  requireNamespace("DBI", quietly = TRUE)
-  library(DBI)
-  requireNamespace("RMySQL", quietly = TRUE)
-  library(RMySQL)
-  library(knitr)
-  library(dplyr)
-  library(ggplot2)
 
 # CALCULO DE PERDA DE PACOTES
 #======================================================================================================
@@ -175,12 +154,11 @@ dadosRede <- dadosCaptura %>%
   )
 
 #GRAFICO DE LINHA
-library(ggplot2)
 ggplot(dadosRede, aes(x = dthCriacao, y = taxa_perda_pacotes)) +
   geom_line(color = "blue", size = 1) +
   geom_point(color = "red", size = 2) +
   labs(
-    title = "Taxa de perda de pacotes por dia",
+    title = "Taxa de Perda de Pacotes por Dia",
     x = "Data",
     y = "Taxa de Perda (%)"
   ) +
@@ -207,14 +185,14 @@ tamanhoMedioPacote_R <- (megabyte_R * 1024) / pacotes_R
 
 ```
 
-#### Média de Download: **`r m_download`**
-#### Média de Upload: **`r m_upload`**
+#### **Média de Download: `r m_download`Mb **
+#### **Média de Upload: `r m_upload`Mb **
 
-#### Tamanho médio de pacotes: **`r tamanhoMedioPacote`**
+#### **Tamanho médio de pacotes: `r tamanhoMedioPacote`Kb**
 
-# Análise de Alerta:
+# **Análise de Alerta**
 
-### Mediante aos ultimos 7 dias, criamos as seguintes métricas:
+#### Mediante aos últimos sete dias, foram identificados padrões e tendências nos alertas.
 
 ```{r pressure_alert, echo=FALSE}
 #Pacote:
@@ -239,15 +217,29 @@ totalAlertas <- sum(qtdAlertas_dia$qtdAlertas)
 
   
 #GRAFICO PREVISAO DE TENDENCIA
+#pegar P e R !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #======================================================================================================
 ggplot(qtdAlertas_dia, aes(x = dias, y = qtdAlertas)) +
-  geom_line(color = "blue") +  # Linha dos dados
-  geom_point(color = "red") +  # Pontos dos dados
-  geom_smooth(method = "lm", color = "green") +  # Linha de regressão linear
-  labs(title = "Previsao de tendencia",
-       x = "Data",
-       y = "Quantidade de Alertas") +
+  geom_line(color = "blue") +
+  geom_point(color = "red") +
+  geom_smooth(method = "lm", color = "green") +
+  labs(
+    title = "Previsão de Tendência de Alertas",
+    x = "Dias",
+    y = "Quantidade de Alertas"
+  ) +
   theme_minimal()
+
+```
+
+### **Resumo de Alertas**
+#### Média de quantidade de alertas por dia: **`r mediaAlertas_dia`**
+#### Quantidade de alertas na semana: **`r totalAlertas`**
+
+
+### **Ranking de Recursos mais problemáticos:**
+
+```{r pressure_alert2, echo=FALSE}
 
 #RANKING DE RECURSO
 #======================================================================================================
@@ -257,14 +249,30 @@ df_recursos <- dadosCaptura %>%
     qtdAlertas = sum(isAlerta == 1)  
   )
 
-ranking <- df_recursos %>%
-  slice_max(order_by = qtdAlertas, n = 14)
+df_recursos$idRecurso[df_recursos$idRecurso == 1] <- "CPU"
+df_recursos$idRecurso[df_recursos$idRecurso == 2] <- "RAM"
+df_recursos$idRecurso[df_recursos$idRecurso == 3] <- "Uso Geral"
+df_recursos$idRecurso[df_recursos$idRecurso == 4] <- "Velocidade de Download"
+df_recursos$idRecurso[df_recursos$idRecurso == 5] <- "Velocidade de Upload"
+df_recursos$idRecurso[df_recursos$idRecurso == 6] <- "Erro de Pacotes de Entrada"
+df_recursos$idRecurso[df_recursos$idRecurso == 7] <- "Erro de Pacotes de Saída"
+df_recursos$idRecurso[df_recursos$idRecurso == 8] <- "Descarte de Pacotes de Entrada"
+df_recursos$idRecurso[df_recursos$idRecurso == 9] <- "Descarte de Pacotes de Saída"
+df_recursos$idRecurso[df_recursos$idRecurso == 10] <- "Megabytes Recebidos"
+df_recursos$idRecurso[df_recursos$idRecurso == 11] <- "Megabytes Enviados"
+df_recursos$idRecurso[df_recursos$idRecurso == 12] <- "Pacotes Enviados"
+df_recursos$idRecurso[df_recursos$idRecurso == 13] <- "Pacotes Recebidos"
 
-kable(ranking, caption = "Ranking dos Recursos com Mais Alertas")
+colnames(df_recursos) <- c("Nome do Recurso", "Quantidade de Alertas")
+coluna <- "Quantidade de Alertas"
+ranking <- df_recursos %>%
+  slice_max(order_by = !!sym(coluna), n = 14)
+
+kable(ranking)%>%
+  kable_styling(full_width = TRUE, bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
-#### Média de quantidade de alertas por dia: **`r mediaAlertas_dia`**
-#### Quantidade de alertas na semana: **`r totalAlertas`**
+
 
 
