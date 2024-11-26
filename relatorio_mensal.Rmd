@@ -1,5 +1,5 @@
 ---
-title: "SGI - Relatório Semanal"
+title: "SGI - Relatório Mensal"
 subtitle: "Análise e Insights do Monitoramento de Servidores"
 author: "Equipe de AD (Análise de Dados) - ServGuard"
 date: "`r format(Sys.Date(), '%d/%m/%Y')`"
@@ -30,7 +30,7 @@ library(gridExtra)
 ---
 
 # **Introdução**
-#### Este relatório apresenta uma análise detalhada do desempenho dos recursos monitorados e dos alertas registrados nos últimos 7 dias. Por meio dos dados capturados, destacam-se as tendências de uso de recursos, estabilidade de rede e os recursos mais problemáticos, fornecendo insights importantes para o monitoramento.
+#### Este relatório apresenta uma análise detalhada do desempenho dos recursos monitorados e dos alertas registrados nos últimos 30 dias. Por meio dos dados capturados, destacam-se as tendências de uso de recursos, estabilidade de rede e os recursos mais problemáticos, fornecendo insights importantes para o monitoramento.
 
 ```{r echo=FALSE}
 
@@ -46,7 +46,7 @@ library(gridExtra)
                        password = "urubu100")
   
   #Variavel com o select do banco:
-  select <- "SELECT * FROM vista_capturas_relatorio_semanal  WHERE idEmpresa = 1;"
+  select <- "SELECT * FROM vista_capturas_relatorio_mensal  WHERE idEmpresa = 1;"
   
   #Chamar o select e transformar os dado recebidos em uma variavel:
   dadosCaptura <- dbGetQuery(conexao,select)
