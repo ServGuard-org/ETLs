@@ -46,6 +46,7 @@ def main():
     channel_id = "C081XHLS15M"
 
     enviar_para_slack(channel_id, caminho_relatorio_html, mensagem)
+    enviar_para_slack(channel_id, caminho_relatorio_pdf, mensagem)
 
 if __name__ == "__main__":
     main()
