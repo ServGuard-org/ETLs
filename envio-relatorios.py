@@ -36,11 +36,11 @@ def main():
     mensagem = None
     if opcao == 1:
         caminho_relatorio_html = "./relatorio_semanal.html"
-        caminho_relatorio_pdf = "./relatorio_semanal.pdf"
+        caminho_relatorio_pdf = "./relatorio_semanal_PDF.pdf"
         mensagem = "Relatório Semanal de Monitoramento de Hardware: "
     elif opcao == 2:
         caminho_relatorio_html = "./relatorio_mensal.html"
-        caminho_relatorio_pdf = "./relatorio_mensal.pdf"
+        caminho_relatorio_pdf = "./relatorio_mensal_PDF.pdf"
         mensagem = "Relatório Mensal de Monitoramento de Hardware: "
 
     channel_id = "C081XHLS15M"
