@@ -31,18 +31,21 @@ def main():
             if opcao == 1 or opcao == 2:
                 condicao = False
 
-    caminho_relatorio = None
+    caminho_relatorio_html = None
+    caminho_relatorio_pdf = None
     mensagem = None
     if opcao == 1:
-        caminho_relatorio = "./relatorio_semanal.html"
+        caminho_relatorio_html = "./relatorio_semanal.html"
+        caminho_relatorio_pdf = "./relatorio_semanal.pdf"
         mensagem = "Relatório Semanal de Monitoramento de Hardware: "
     elif opcao == 2:
-        caminho_relatorio = "./relatorio_mensal.html"
+        caminho_relatorio_html = "./relatorio_mensal.html"
+        caminho_relatorio_pdf = "./relatorio_mensal.pdf"
         mensagem = "Relatório Mensal de Monitoramento de Hardware: "
 
     channel_id = "C081XHLS15M"
 
-    enviar_para_slack(channel_id, caminho_relatorio, mensagem)
+    enviar_para_slack(channel_id, caminho_relatorio_html, mensagem)
 
 if __name__ == "__main__":
     main()
